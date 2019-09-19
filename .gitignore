@@ -1,0 +1,4 @@
+# ignore below files
+node_modules
+dist
+.idea
