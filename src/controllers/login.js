@@ -1,31 +1,38 @@
-import Nexmo from 'nexmo';
+import {isAValidPhoneNumber} from '../util/validator';
+import {errorMessages} from '../util/constants';
+import {registerNewUser} from '../services/register-new-user';
+import {getUser} from '../services/get-user';
 
 export const loginRoute = {
     path: '/login',
-    method: 'GET',
+    method: 'POST',
     options: {
         handler: (request, h) => {
-            console.log(request);
-            const nexmo = new Nexmo({
-                apiKey: '878bd97b',
-                apiSecret: '17d4e80432b74b18'
-            }, {debug:true});
+            const phoneNumber = request.payload.phoneNumber;
+            let errors = [];
 
+            if (isAValidPhoneNumber(phoneNumber)) {
+                // code to send otp and verify
+                const response = getUser(phoneNumber);
+                console.log('response', response);
 
-            nexmo.message.sendSms(
-                '12034848525',
-                '+917767982950',
-                'Hello from Nexmo',
-                {type: 'unicode'},
-                (err, a) => {
-                     if(err) {
-                         console.log('error', err);
-                     } else {
-                         console.log('success', a);
-                     }
+                if (response.error) {
+                    errors.push({
+                        errorMessage: errorMessages.LoginFailed
+                    });
                 }
-            )
-            return 0;
+                if (response === 1) { // this is failing, need to debug
+                    // update user to active=0
+                } else {
+                    return registerNewUser(phoneNumber);
+                }
+            }
+            else {
+                errors.push({
+                    errorMessage: errorMessages.InvalidPhoneNumber
+                });
+            }
+            return errors;
         }
     }
 };
