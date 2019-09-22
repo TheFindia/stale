@@ -1,0 +1,104 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Findia Template",
+  "Parameters": {
+    "BeanstalkService": {
+      "Type": "String",
+      "Default": "FindiaServiceRole"
+    },
+    "Ec2Service": {
+      "Type": "String",
+      "Default": "FindiaEc2Service"
+    },
+    "SolutionStackName": {
+      "Type": "String",
+      "Default": "64bit Amazon Linux 2018.03 v4.10.2 running Node.js"
+    },
+    "Partition": {
+      "Type": "String"
+    },
+    "PlatformArn": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "FindiaVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": "false",
+        "EnableDnsSupport": "false",
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Component",
+            "Value": "findia"
+          },
+          {
+            "Key": "Name",
+            "Value": "findia-vpc"
+          }
+        ]
+      }
+    },
+    "FindiaSubnets": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "FindiaVpc"
+        },
+        "CidrBlock": "10.0.0.0/24",
+        "AvailabilityZone": "us-east-1a",
+        "Tags": [
+          {
+            "Key": "Component",
+            "Value": "findia"
+          },
+          {
+            "Key": "Name",
+            "Value": "findia-subnet"
+          }
+        ]
+      }
+    },
+    "FindiaApplication": {
+      "Type": "AWS::ElasticBeanstalk::Application",
+      "Description": "AWS Elastic Beanstalk Python Sample Application",
+      "Properties": {
+        "ApplicationVersions": [
+          {
+            "Description": "Version 1.0",
+            "SourceBundle": {
+              "S3Bucket": "findia-resources",
+              "S3Key": "findia.zip"
+            },
+            "VersionLabel": "Initial Version"
+          }
+        ]
+      }
+    },
+    "FindiaEnvironment": {
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "FindiaApplication"
+        },
+        "Description": "AWS Elastic Beanstalk Environment running Python Sample Application",
+        "PlatformArn": {
+          "Ref": "PlatformArn"
+        },
+        "SolutionStackName": {
+          "Ref": "SolutionStackName"
+        },
+        "VersionLabel": "Initial Version",
+        "OptionSettings": [
+          {
+            "Namespace": "aws:elasticbeanstalk:environment",
+            "OptionName": "ServiceRole",
+            "Value": "aws-elasticbeanstalk-service-role"
+          }
+        ]
+      },
+      "Type": "AWS::ElasticBeanstalk::Environment"
+    }
+  }
+}
