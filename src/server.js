@@ -1,6 +1,6 @@
 import * as Hapi from '@hapi/hapi';
 import {loginRoute} from './controllers/login';
-import {registerRoute} from './controllers/register';
+import {rootRoute} from './controllers/root';
 import config from 'config';
 import open from 'open';
 
@@ -12,7 +12,7 @@ var server = new Hapi.server({
 const init = async () => {
     try {
         console.log("hello");
-        server.route([loginRoute, registerRoute]);
+        server.route([rootRoute, loginRoute]);
         await server.start();
         console.log("server started at: ", server.settings.port);
 
