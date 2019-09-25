@@ -3,6 +3,7 @@ import {loginRoute} from './controllers/login';
 import {rootRoute} from './controllers/root';
 import config from 'config';
 import open from 'open';
+import {userPreferencesRoute} from './controllers/user-preferences';
 
 var server = new Hapi.server({
     host: config.host,
@@ -12,7 +13,7 @@ var server = new Hapi.server({
 const init = async () => {
     try {
         console.log("hello");
-        server.route([rootRoute, loginRoute]);
+        server.route([rootRoute, loginRoute, ...userPreferencesRoute]);
         await server.start();
         console.log("server started at: ", server.settings.port);
 
