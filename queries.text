@@ -1,0 +1,90 @@
+	CREATE DATABASE FINDIA;
+
+	USE FINDIA;
+
+	CREATE TABLE USERS
+	(
+		ID VARCHAR(45) NOT NULL,
+		FIRST_NAME VARCHAR(45) DEFAULT '',
+		SECOND_NAME VARCHAR(45) DEFAULT '',
+		EMAIL VARCHAR(45) DEFAULT '',
+		PASSWORD VARCHAR(45) DEFAULT '',
+		CONTACT_NO bigint NOT NULL CONSTRAINT valid_phone_number
+		CHECK (REGEXP_LIKE(CONTACT_NO, '^[7-9][0-9]{9}$')),
+		IMAGE VARCHAR(255),
+		LOGIN_FROM tinyint(1) NOT NULL DEFAULT '0' COMMENT '0-FINDIA, 1-GMAIL, 2-FB',
+		CREATED_ON timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		ACTIVE tinyint(1) DEFAULT 0 COMMENT '0-ACTIVE,  1-DELETED',
+        USER_TYPE VARCHAR(45) NOT NULL,
+        CHECK(USER_TYPE IN('ADMIN','SUPER_ADMIN','USER','CLIENT')),
+		CHECK(ACTIVE IN(0, 1)),
+		CHECK(LOGIN_FROM IN(0, 1, 2)),
+		PRIMARY KEY(ID)
+	);
+
+    CREATE TABLE USER_PREFERENCES
+    (
+		ID INT unsigned NOT NULL AUTO_INCREMENT,
+		CITY VARCHAR(45),
+		AREA VARCHAR(45),
+		USER_ID VARCHAR(45) NOT NULL,
+		FOREIGN KEY (USER_ID) REFERENCES USERS(ID),
+		PRIMARY KEY(ID)
+   );
+
+   CREATE TABLE CITY (
+	  ID int(11) NOT NULL AUTO_INCREMENT,
+	  CITY_NAME varchar(50) NOT NULL,
+	  CITY_IMAGE varchar(255) NOT NULL,
+	  CREATED_ON timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  CREATED_BY tinyint(5) NOT NULL,
+	  ACTIVE tinyint(2) DEFAULT 0 COMMENT '0-ACTIVE,  1-DELETED',
+	  GRID tinyint(1) NOT NULL DEFAULT 0,
+	  UPDATED_ON timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  UPDATED_BY tinyint(4) DEFAULT NULL,
+	  ADDED_TYPE varchar(25) DEFAULT NULL,
+	  UPDATED_TYPE varchar(25) DEFAULT NULL,
+	  CHECK(ACTIVE IN(0, 1)),
+	  PRIMARY KEY(ID)
+	);
+
+	CREATE TABLE AREA (
+	  ID int(11) NOT NULL AUTO_INCREMENT,
+	  AREA_NAME varchar(50) NOT NULL,
+	  CITY_ID int(11) NOT NULL,
+	  AREA_IMAGE varchar(255) NOT NULL,
+	  CREATED_ON timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  CREATED_BY tinyint(5) NOT NULL,
+	  ACTIVE tinyint(4) NOT NULL DEFAULT '0',
+	  UPDATED_ON timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  UPDATED_BY tinyint(4) DEFAULT NULL,
+	  ADDED_TYPE varchar(25) DEFAULT NULL,
+	  UPDATED_TYPE varchar(25) DEFAULT NULL,
+	  CHECK(ACTIVE IN(0, 1)),
+	  FOREIGN KEY (CITY_ID) REFERENCES CITY(ID),
+	  PRIMARY KEY(ID)
+	  );
+
+
+
+   insert into users (contact_no) values (8989433883);
+
+   drop table findia_users
+
+   ----------------------------------------------------------------
+   -- Admin Queries
+   ----------------------------------------------------------------
+      insert into city (city_name, city_image,   CREATED_BY,   GRID) values('pune', 'some s3 url', 2, 1);
+
+
+   ----------------------------------------------------------------
+   -- Register User Queries
+   ----------------------------------------------------------------
+         insert into users (user_id, contact_no) values (123, 8989433883);
+		 insert into USER_PREFERENCES (user_id) values (1001);
+
+	----------------------------------------------------------------
+	-- When user selects City And Area
+	----------------------------------------------------------------
+
+		update user_preferences set city='Pune' area= 'hadpsar' where user_id=1001;
