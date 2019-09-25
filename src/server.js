@@ -1,6 +1,7 @@
 import * as Hapi from '@hapi/hapi';
 import {loginRoute} from './controllers/login';
 import {rootRoute} from './controllers/root';
+import {usersRoute} from './controllers/users';
 import config from 'config';
 import open from 'open';
 import {userPreferencesRoute} from './controllers/user-preferences';
@@ -13,12 +14,12 @@ var server = new Hapi.server({
 const init = async () => {
     try {
         console.log("hello");
-        server.route([rootRoute, loginRoute, ...userPreferencesRoute]);
+        server.route([rootRoute, loginRoute, ...userPreferencesRoute, ...usersRoute]);
         await server.start();
         console.log("server started at: ", server.settings.port);
 
-        if (process.env.NODE_ENV === 'localhost') { // eslint-disable-line no-process-env
-            open(`http://${process.env.COMPUTERNAME}.jdnet.deere.com:${config.port}/login`); // eslint-disable-line no-process-env
+        if (process.env.NODE_ENV === 'localhost') {
+            open(`localhost:${config.port}/login`);
         }
 
     } catch (err) {

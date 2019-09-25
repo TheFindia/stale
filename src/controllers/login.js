@@ -1,39 +1,42 @@
-import {isAValidPhoneNumber} from '../util/validator';
+import {isAValidPhoneNumber, isAValidUserType} from '../util/validator';
 import {errorMessages} from '../util/constants';
-import {registerNewUser} from '../services/register-new-user';
-import {getUser} from '../services/get-user';
+import {getUsersByPhoneNumberAndUserType, registerNewUser} from '../services/users';
 
 export const loginRoute = {
     path: '/login',
-    method: 'POST',
+    method: 'GET',
     options: {
-        handler: (request, h) => {
-            const phoneNumber = request.payload.phoneNumber;
+        handler: async (request, h) => {
+            const phoneNumber = request.query.phoneNumber;
+            const userType = request.query.userType;
             let errors = [];
+            const validPhoneNumber = isAValidPhoneNumber(phoneNumber);
+            const validUserType = isAValidUserType(userType);
 
-            if (isAValidPhoneNumber(phoneNumber)) {
+            if (validPhoneNumber && validUserType) {
                 // code to send otp and verify
-                const response = getUser(phoneNumber);
-                console.log('response', response);
-
-                if (response.error) {
+                const user = await getUsersByPhoneNumberAndUserType(phoneNumber, userType);
+                if (user) {
+                    return user;
+                } else {
+                    const isUserRegistered = await registerNewUser(phoneNumber, userType);
+                    if (isUserRegistered) {
+                        return await getUsersByPhoneNumberAndUserType(phoneNumber, userType);
+                    }
+                }
+            } else {
+                if (!validPhoneNumber) {
                     errors.push({
-                        errorMessage: errorMessages.LoginFailed
+                        errorMessage: errorMessages.InvalidPhoneNumber
                     });
                 }
-                if (response === 1) { // this is failing, need to debug
-                    // update user to active=0
-                } else {
-                    return registerNewUser(phoneNumber);
+                if (!validUserType) {
+                    errors.push({
+                        errorMessage: errorMessages.InvalidUserType
+                    });
                 }
-            }
-            else {
-                errors.push({
-                    errorMessage: errorMessages.InvalidPhoneNumber
-                });
             }
             return errors;
         }
     }
 };
-
