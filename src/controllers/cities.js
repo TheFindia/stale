@@ -1,14 +1,15 @@
-import {createCity, getCity, updateCity, removeCity} from '../services/cities';
+import {createCity, getCity, removeCity, updateCity} from '../services/cities';
+import {validateId} from '../util/validator';
+import {ERROR_MAPPINGS} from "../util/constants";
 
 export const citiesRoute = [{
-    path: '/cities/{cityName}',
+    path: '/cities/{id}',
     method: 'GET',
     options: {
         handler: (request, h) => {
-            const {params} = request;
-            const {cityName} = params;
+            const {id} = request.params;
 
-            return getCity(cityName)
+            return getCity(id)
                 .catch((e) => e);
         }
     }
@@ -17,35 +18,46 @@ export const citiesRoute = [{
     method: 'POST',
     options: {
         handler: (request, h) => {
-            const {payload} = request;
-            const {cityName, cityImage} = payload;
+            const {cityName, cityImage} = request.payload;
 
             return createCity(cityName, cityImage)
+                .then((id) => getCity(id))
                 .catch(error => error);
         }
     }
 }, {
-    path: '/cities/{cityName}',
+    path: '/cities/{id}',
     method: 'PUT',
     options: {
         handler: (request, h) => {
-            const {payload, params} = request;
-            const {cityName: oldCityName} = params;
-            const {cityName: newCityName, cityImage} = payload;
+            const {id: idFromParams} = request.params;
+            const {id: idFromPayload, cityName, cityImage} = request.payload;
 
-            return updateCity(oldCityName, newCityName, cityImage)
+            validateId(idFromParams, idFromPayload);
+
+            return updateCity(idFromParams, cityName, cityImage)
+                .then((result) => {
+                    if (result.affectedRows === 0) {
+                        return ERROR_MAPPINGS.ENTITY_DOESNT_EXIST;
+                    }
+
+                    return {
+                        id: idFromPayload,
+                        cityName,
+                        cityImage
+                    }
+                })
                 .catch(error => error);
         }
     }
 }, {
-    path: '/cities/{cityName}',
+    path: '/cities/{id}',
     method: 'DELETE',
     options: {
         handler: (request, h) => {
-            const {params} = request;
-            const {cityName} = params;
+            const {id} = request.params;
 
-            return removeCity(cityName)
+            return removeCity(id)
                 .catch(error => error);
         }
     }

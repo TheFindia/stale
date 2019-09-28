@@ -7,8 +7,10 @@ export const errorMessages = {
     InvalidUserType: 'INVALID_USER_TYPE'
 };
 
-export const DB_ERROR_MAPPINGS = {
-    ER_DUP_ENTRY: 'Duplicate Entry',
-    ER_ROW_IS_REFERENCED_2: 'An Area is associated with this City, please delete it first',
-    CITY_DOESNT_EXIST: 'City you tried to update doesn\'t exist'
+export const ERROR_MAPPINGS = {
+    ER_DUP_ENTRY: 'DUPLICATE_ENTRY',
+    ER_ROW_IS_REFERENCED_2: 'ROW_REFERENCED_CANNOT_BE_DELETED',
+    ENTITY_DOESNT_EXIST: 'DOESNT_EXIST',
+    DEFAULT: 'ERROR_OCCURRED',
+    INVALID_PAYLOAD: 'INVALID_PAYLOAD'
 };
