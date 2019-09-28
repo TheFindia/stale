@@ -1,19 +1,16 @@
-import {getUserPreferences} from '../services/get-user-preferences';
-import {updateUserPreferences} from '../services/update-user-preferences';
+import {createUserPreference, getUserPreference, updateUserPreferences} from '../services/preferences';
+import {validateId} from '../util/validator';
+import {ERROR_MAPPINGS} from "../util/constants";
 
 export const userPreferencesRoute = [{
-    path: '/userPreferences',
+    path: '/userPreferences/{id}',
     method: 'GET',
     options: {
         handler: (request, h) => {
-            const {query} = request;
-            const {userId} = query;
+            const {id} = request.params;
 
-            try {
-                return getUserPreferences(userId);
-            } catch (e) {
-                return e;
-            }
+            return getUserPreference(id)
+                .catch((e) => e);
         }
     }
 }, {
@@ -21,22 +18,36 @@ export const userPreferencesRoute = [{
     method: 'POST',
     options: {
         handler: (request, h) => {
-           // NOT REQUIRED
+            const {userId, cityId, areaId} = request.payload;
+
+            return createUserPreference(userId, cityId, areaId)
+                .then((id) => getUserPreference(id))
+                .catch((e) => e);
         }
     }
 }, {
-    path: '/userPreferences',
+    path: '/userPreferences/{id}',
     method: 'PUT',
     options: {
         handler: (request, h) => {
-            const {query} = request;
-            const {userId, city, area} = query;
+            const {id: idFromParams} = request.params;
+            const {id: idFromPayload, cityId, areaId} = request.payload;
 
-            try {
-                return updateUserPreferences(userId, city, area)
-            } catch (e) {
-                return e;
-            }
+            validateId(idFromParams, idFromPayload);
+
+            return updateUserPreferences(idFromPayload, cityId, areaId)
+                .then((result) => {
+                    if (result.affectedRows === 0) {
+                       return ERROR_MAPPINGS.ENTITY_DOESNT_EXIST;
+                    }
+
+                    return {
+                        id: idFromPayload,
+                        cityId,
+                        areaId
+                    }
+                })
+                .catch((e) => e);
         }
     }
 }, {
