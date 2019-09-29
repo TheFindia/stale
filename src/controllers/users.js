@@ -1,8 +1,8 @@
 import {createUser, getUserById, getUsersByPhoneNumberAndUserType, updateUserById} from '../services/users';
-import {errorMessages} from '../util/constants';
 import {isAValidPhoneNumber, isAValidUserType, validateId} from '../util/validator';
+import {errorMessages} from '../util/constants';
 
-export const usersRoute = [
+export const endpoints = [
     {
         path: '/users/{id}',
         method: 'GET',

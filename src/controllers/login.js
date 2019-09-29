@@ -2,7 +2,7 @@ import {isAValidPhoneNumber, isAValidUserType} from '../util/validator';
 import {errorMessages} from '../util/constants';
 import {createUser, getUserById, getUsersByPhoneNumberAndUserType} from '../services/users';
 
-export const loginRoute = {
+export const endpoints = [{
     path: '/login',
     method: 'GET',
     options: {
@@ -43,4 +43,4 @@ export const loginRoute = {
             return errors;
         }
     }
-};
+}];

@@ -1,4 +1,4 @@
-export const rootRoute = {
+export const endpoints = [{
     path: '/',
     method: 'GET',
     options: {
@@ -7,4 +7,4 @@ export const rootRoute = {
             return h.redirect('/login');
         }
     }
-};
+}];
