@@ -1,4 +1,4 @@
-import {createCity, getCity, removeCity, updateCity} from '../services/cities';
+import {createCity, getCityById, removeCity, updateCity} from '../services/cities';
 import {validateId} from '../util/validator';
 import {ERROR_MAPPINGS} from "../util/constants";
 
@@ -9,7 +9,7 @@ export const citiesRoute = [{
         handler: (request, h) => {
             const {id} = request.params;
 
-            return getCity(id)
+            return getCityById(id)
                 .catch((e) => e);
         }
     }
@@ -17,11 +17,21 @@ export const citiesRoute = [{
     path: '/cities',
     method: 'POST',
     options: {
+        payload: {
+            output: 'stream',
+            parse: true,
+            allow: 'multipart/form-data'
+        },
         handler: (request, h) => {
             const {cityName, cityImage} = request.payload;
+            let fileName = '';
 
-            return createCity(cityName, cityImage)
-                .then((id) => getCity(id))
+            if (cityImage) {
+                fileName = cityImage.hapi['filename'];
+            }
+
+            return createCity(cityName, fileName)
+                .then((id) => getCityById(id))
                 .catch(error => error);
         }
     }
@@ -29,13 +39,23 @@ export const citiesRoute = [{
     path: '/cities/{id}',
     method: 'PUT',
     options: {
+        payload: {
+            output: 'stream',
+            parse: true,
+            allow: 'multipart/form-data'
+        },
         handler: (request, h) => {
             const {id: idFromParams} = request.params;
             const {id: idFromPayload, cityName, cityImage} = request.payload;
+            let fileName = '';
+
+            if (cityImage) {
+                fileName = cityImage.hapi['filename'];
+            }
 
             validateId(idFromParams, idFromPayload);
 
-            return updateCity(idFromParams, cityName, cityImage)
+            return updateCity(idFromParams, cityName, fileName)
                 .then((result) => {
                     if (result.affectedRows === 0) {
                         return ERROR_MAPPINGS.ENTITY_DOESNT_EXIST;
