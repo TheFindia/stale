@@ -5,7 +5,7 @@ import uuidv1 from 'uuid/v1';
 
 const createCityQuery = 'insert into CITIES(id, city_name, city_image) values (?,?,?)';
 
-export const createCity = (cityName, cityImage) => {
+export const createCity = (cityName, cityImage = '') => {
     const id = uuidv1();
 
     return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ export const createCity = (cityName, cityImage) => {
 
 const getCityQuery = 'SELECT id, city_name as cityName, city_image as cityImage FROM CITIES WHERE ID = ?';
 
-export const getCity = (cityId) => {
+export const getCityById = (cityId) => {
     return new Promise((resolve, reject) => {
         pool.query(getCityQuery, [cityId], (err, result) => {
             if (err) {
@@ -52,7 +52,7 @@ export const removeCity = (cityId) => {
 
 const updateCityQuery = 'UPDATE CITIES set city_name=?, city_image=? where id=?';
 
-export const updateCity = (cityId, cityName, cityImage) => {
+export const updateCity = (cityId, cityName, cityImage = '') => {
     return new Promise((resolve, reject) => {
         pool.query(updateCityQuery, [cityName, cityImage, cityId], (err, result) => {
             if (err) {
