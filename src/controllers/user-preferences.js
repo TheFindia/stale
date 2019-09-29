@@ -2,7 +2,7 @@ import {createUserPreference, getUserPreference, updateUserPreferences} from '..
 import {validateId} from '../util/validator';
 import {ERROR_MAPPINGS} from "../util/constants";
 
-export const userPreferencesRoute = [{
+export const endpoints = [{
     path: '/userPreferences/{id}',
     method: 'GET',
     options: {

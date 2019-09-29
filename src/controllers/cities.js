@@ -2,7 +2,7 @@ import {createCity, getCityById, removeCity, updateCity} from '../services/citie
 import {validateId} from '../util/validator';
 import {ERROR_MAPPINGS} from "../util/constants";
 
-export const citiesRoute = [{
+export const endpoints = [{
     path: '/cities/{id}',
     method: 'GET',
     options: {
