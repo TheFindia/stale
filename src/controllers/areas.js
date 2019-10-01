@@ -1,20 +1,20 @@
-import {createCity, getCityById, removeCity, updateCity} from '../services/cities';
-import {validateId} from '../util/validator';
+import {createArea, getAreaById, removeArea, updateArea} from '../services/areas';
+import {validateId} from "../util/validator";
 import {ERROR_MAPPINGS} from "../util/constants";
 
 export const endpoints = [{
-    path: '/cities/{id}',
+    path: '/areas/{id}',
     method: 'GET',
     options: {
-        handler: (request, h) => {
+        handler: async (request) => {
             const {id} = request.params;
 
-            return getCityById(id)
+            return await getAreaById(id)
                 .catch((e) => e);
         }
     }
 }, {
-    path: '/cities',
+    path: '/areas',
     method: 'POST',
     options: {
         payload: {
@@ -22,21 +22,21 @@ export const endpoints = [{
             parse: true,
             allow: 'multipart/form-data'
         },
-        handler: (request) => {
-            const {cityName, cityImage} = request.payload;
+        handler: async (request) => {
+            const {areaName, cityId, areaImage} = request.payload;
+
             let fileName = '';
 
-            if (cityImage) {
-                fileName = cityImage.hapi['filename'];
+            if (areaImage) {
+                fileName = areaImage.hapi['filename'];
             }
-
-            return createCity(cityName, fileName)
-                .then((id) => getCityById(id))
-                .catch(error => error);
+            return await createArea(areaName, cityId, fileName)
+                .then((id) => getAreaById(id))
+                .catch((e) => e);
         }
     }
 }, {
-    path: '/cities/{id}',
+    path: '/areas/{id}',
     method: 'PUT',
     options: {
         payload: {
@@ -46,16 +46,16 @@ export const endpoints = [{
         },
         handler: (request, h) => {
             const {id: idFromParams} = request.params;
-            const {id: idFromPayload, cityName, cityImage} = request.payload;
+            const {id: idFromPayload, areaName, areaImage} = request.payload;
             let fileName = '';
 
-            if (cityImage) {
-                fileName = cityImage.hapi['filename'];
+            if (areaImage) {
+                fileName = areaImage.hapi['filename'];
             }
 
             validateId(idFromParams, idFromPayload);
 
-            return updateCity(idFromParams, cityName, fileName)
+            return updateArea(idFromParams, areaName, fileName)
                 .then((result) => {
                     if (result.affectedRows === 0) {
                         return ERROR_MAPPINGS.ENTITY_DOESNT_EXIST;
@@ -63,21 +63,21 @@ export const endpoints = [{
 
                     return {
                         id: idFromPayload,
-                        cityName,
-                        cityImage
+                        areaName,
+                        areaImage
                     }
                 })
                 .catch(error => error);
         }
     }
 }, {
-    path: '/cities/{id}',
+    path: '/areas/{id}',
     method: 'DELETE',
     options: {
         handler: (request, h) => {
             const {id} = request.params;
 
-            return removeCity(id)
+            return removeArea(id)
                 .catch(error => error);
         }
     }
